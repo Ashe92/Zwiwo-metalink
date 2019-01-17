@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="ant-example-metalink" name="Metalink-ant exercise">
+    <property file="default.properties"/>
+    <path id="build.path">
+        <fileset dir="${basedir}\target\libraries\"  includes="*.jar" />
+    </path>
+
+    <taskdef name="metalink" classname="metalink.MetalinkTask" classpath="target/classes" classpathref="build.path"/>
+
+    <target name="ant-example-metalink">
+        <metalink url="http://zad-zwiwo.com/download/" file="zad-zwiwo.xml">
+            <fileset dir="." />
+        </metalink>
+    </target>
+    <target name="ant-hello">
+        <echo>${basedir}\target\libraries</echo>
+    </target>
+</project>
