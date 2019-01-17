@@ -1,5 +1,3 @@
-package metalink;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "file")

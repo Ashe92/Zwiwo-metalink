@@ -1,9 +1,7 @@
-package metalink;
-
-import Services.FileService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
+import org.apache.tools.ant.types.FileSet;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,7 +15,10 @@ public class MetalinkTask  extends Task {
 
     private String url;
     private String file;
-    protected List<MetaFile> filesets = new ArrayList();
+
+    protected List<FileSet> filesets = new ArrayList();
+
+   // protected List<MetaFile> filesetss = new ArrayList();
 
     @Override
     public void execute() throws BuildException {
@@ -94,7 +95,7 @@ public class MetalinkTask  extends Task {
         this.file = file;
     }
 
-    public void addFileset(MetaFile fileset) {
+    public void addFileset(FileSet fileset) {
         filesets.add(fileset);
     }
 }
