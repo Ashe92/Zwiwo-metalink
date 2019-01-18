@@ -11,41 +11,62 @@ import java.util.List;
 
 public class MetalinkTask  extends Task {
 
-    protected FileService fileService = new FileService();
+    public static final String MetalinkUrl = "server.files.url";
+    public static final String UserDir = ".";
+    private FileService fileService = new FileService();
 
+    //elements of metalink
     private String url;
     private String file;
-
-    protected List<FileSet> filesets = new ArrayList();
-
-   // protected List<MetaFile> filesetss = new ArrayList();
+    private List<FileSet> filesets = new ArrayList();
 
     @Override
     public void execute() throws BuildException {
         super.execute();
+        Validate();
         GetUrl();
         Metalink generatedMetalink = GetMetalinkFile();
         fileService.SaveMetalinkFile(generatedMetalink);
     }
 
-    protected void GetUrl() {
-        //todo if url from build empty set form property
-        getProject();
-        setUrl(getProject().getProperty("server.files.url"));
+    private void Validate() {
+        if (url == null) throw new BuildException("Attribute \"url\" is not specified!");
+        if (file == null) throw new BuildException("Attribute \"file\" is not specified!");
     }
 
     private Metalink GetMetalinkFile()
     {
         Metalink newMetalink = new Metalink();
-        //todo load files form path
-        List<File> files = getFiles();
-        //todo change io.files to my FileObject
+        List<File> files = getFilesFromActualDir();
         newMetalink.files = getMetaLinkFiles(files);
 
         return newMetalink;
     }
 
-    public static String GetMd5(File file){
+    private List<File> getFilesFromActualDir() {
+        File folder = new File(UserDir);
+        File[] listOfFiles = folder.listFiles();
+        return Arrays.asList(listOfFiles);
+    }
+
+    //todo add to fileservice
+    private List<MetaFile> getMetaLinkFiles(List<File> files) {
+
+        List<MetaFile> metaLinkFiles = new ArrayList<>();
+        files.stream().forEach(f -> {
+            MetaFile metaLinkFile = new MetaFile();
+            metaLinkFile.name = f.getName();
+            metaLinkFile.size = f.length();
+            Hash hash = new Hash();
+            hash.value = GetMd5(f);
+            metaLinkFile.hash = hash;
+            metaLinkFile.url = GetUrl() + f.getName();
+            metaLinkFiles.add(metaLinkFile);
+        });
+        return metaLinkFiles;
+    }
+
+    private static String GetMd5(File file){
         try {
             FileInputStream fis = new FileInputStream(file);
             String md5 = DigestUtils.md5Hex(fis);
@@ -55,31 +76,11 @@ public class MetalinkTask  extends Task {
             return "";
         }
     }
-    //todo add to fileservice
-    public List<File> getFiles() {
-        File folder = new File(".");
-        File[] listOfFiles = folder.listFiles();
-        return Arrays.asList(listOfFiles);
-    }
 
-    //todo add to fileservice
-    public List<MetaFile> getMetaLinkFiles(List<File> files) {
-
-        List<MetaFile> metaLinkFiles = new ArrayList<>();
-        files.stream().forEach(f -> {
-            MetaFile metaLinkFile = new MetaFile();
-            metaLinkFile.name = f.getName();
-            metaLinkFile.size = f.length();
-            Hash hash = new Hash();
-            hash.value = DigestUtils.md5Hex(f.getName());
-            metaLinkFile.hash = hash;
-            metaLinkFile.url = getUrl() + f.getName();
-            metaLinkFiles.add(metaLinkFile);
-        });
-        return metaLinkFiles;
-    }
-
-    public String getUrl() {
+    public String  GetUrl() {
+        if (url == null) {
+            setUrl(getProject().getProperty(MetalinkUrl ));
+        }
         return url;
     }
 

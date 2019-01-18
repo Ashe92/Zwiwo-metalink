@@ -11,6 +11,7 @@
         <metalink url="http://zad-zwiwo.com/download/" file="zad-zwiwo.xml">
             <fileset dir="." />
         </metalink>
+        <echo>Done</echo>
     </target>
     <target name="ant-hello">
         <echo>${basedir}\target\libraries</echo>
